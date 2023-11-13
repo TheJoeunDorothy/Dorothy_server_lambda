@@ -21,8 +21,6 @@ COPY app.py ./
 
 # 필요한 모델 파일 복사
 COPY static/* ./static/
-# Static은 잘 있나 확인하기
-RUN ls /var/task/static
 # 모든 권한 부여
 RUN chmod -R 777 /var/task/static
 

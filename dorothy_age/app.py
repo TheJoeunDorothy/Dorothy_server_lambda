@@ -9,23 +9,30 @@ import pandas as pd
 from PIL import Image
 
 def lambda_handler(event, context):
-    if not "body" in event or len(event["body"]) == 0:
-        return {"statusCode": 400, "body": json.dumps({"result": 'No Body'})}
-    image_data = event['body']
-    print("Image data received")  # 로그 추가
-
-    # Base64 디코딩을 통해 이미지를 복원
-    image = base64.b64decode(image_data)
-    print("Image decoded from base64")  # 로그 추가
-
-    # Pillow를 사용하여 이미지로 디코딩
-    image = Image.open(BytesIO(image))
+    ## Properties
     target_size = (128, 128)
     padding_size = (184, 184)
     brightness_adjustment = 83.15755552578428
+    
+    if not "body" in event or len(event["body"]) == 0:
+        return {"statusCode": 400, "body": json.dumps({"result": 'No Body'})}
+    image_data = event['body']
+
+    '''이미지 처리 및 디코딩'''
     try:
+        # Base64 디코딩을 통해 이미지를 복원
+        image = base64.b64decode(image_data)
+        # Pillow를 사용하여 이미지로 디코딩
+        image = Image.open(BytesIO(image))
         # 이미지 불러오기 (Image -> Numpy Array)
         img = np.array(image)
+        
+    except Exception as e:
+        print(e)
+        return {"statusCode": 400, "body": json.dumps({"result": "Can't decode image or make numpy"})}
+    
+    '''얼굴 인식 및 처리 '''
+    try:
         img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         # BGR GRAY 색상 변환 (PIL은 RGB 순서이므로 RGB->BGR 변환 후 GRAY 색상 변환)
         detector = dlib.get_frontal_face_detector()
@@ -33,7 +40,6 @@ def lambda_handler(event, context):
 
         if len(faces) > 0:
             face = faces[0]
-
             x = face.left()
             y = face.top()
             w = face.right() - x
@@ -50,8 +56,10 @@ def lambda_handler(event, context):
             y_offset = (padding_size[1]-target_size[1])//2
 
     except Exception as e:
-        return {"statusCode": 401, "body": json.dumps({"result": str(e)})}
+        print(e)
+        return {"statusCode": 400, "body": json.dumps({"result": "Can't find face"})}
 
+    '''이미지 밝기 조절 '''
     try:
         padded_face[y_offset:y_offset+target_size[1],
                     x_offset:x_offset+target_size[0]] = face_resized
@@ -64,8 +72,10 @@ def lambda_handler(event, context):
         adjusted_image = np.clip(adjusted_image, 0, 255)
 
     except Exception as e:
-        return {"statusCode": 402, "body": json.dumps({"result": str(e)})}
+        print(e)
+        return {"statusCode": 400, "body": json.dumps({"result": "Can't bright images"})}
 
+    '''이미지 사이즈 조절'''
     try:
         img2 = Image.fromarray(adjusted_image.astype('uint8'))
         img2 = img2.convert('L')
@@ -80,8 +90,10 @@ def lambda_handler(event, context):
         df = pd.DataFrame(train)
 
     except Exception as e:
-        return {"statusCode": 403, "body": json.dumps({"result": str(e)})}
+        print(e)
+        return {"statusCode": 400, "body": json.dumps({"result": "Can't resize images"})}
 
+    '''DL 모델 예측'''
     try:
         width, height, channel = 184, 184, 1  # 이미지 사이즈 184*184 pixel
 
@@ -94,10 +106,24 @@ def lambda_handler(event, context):
         pred = load_model('/var/task/static/32_64_64_10_model.h5').predict(X)
 
     except Exception as e:
-        return {"statusCode": 405, "body": json.dumps({"result": str(e)})}
+        print(e)
+        return {"statusCode": 400, "body": json.dumps({"result": "Can't predict Age"})}
 
     classes = ['10대', '20대', '30대', '40대', '50대', '60대', '70대']
     faceAge, percent = classes[np.argmax(pred)], pred
+
+    ## list comprehension
+    '''
+    flat_data = []
+    for sublist in percent:
+        for item in sublist:
+            flat_data.append(item)
+    ''' 
     flat_data = [item for sublist in percent for item in sublist]
 
-    return {"statusCode": 200, "body": json.dumps({'age': faceAge, 'percent' : eval(str(flat_data))})}
+    return {"statusCode": 200, 
+            "body": json.dumps({
+                'age': faceAge, 
+                'percent' : eval(str(flat_data))
+                })
+            }
