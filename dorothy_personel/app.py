@@ -6,18 +6,12 @@ from PIL import Image
 from io import BytesIO
 import json
 import dlib
-import os
 
 def lambda_handler(event, context):
     if not "body" in event or len(event["body"]) == 0:
         return {"statusCode": 400, "body": json.dumps({"result": 'No Body'})}
     image_data = event['body']
     print("Image data received")  # 로그 추가
-
-    
-    print(os.listdir('/var/task/static'))
-    print(os.stat('/var/task/static/shape_predictor_68_face_landmarks.dat'))
-
 
     # Base64 디코딩을 통해 이미지를 복원
     image = base64.b64decode(image_data)

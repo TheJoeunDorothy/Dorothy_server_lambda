@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   python3.11
 
-  Sample SAM Template for dorothy_personel
+  Sample SAM Template for dorothy_SERVER
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -16,7 +16,7 @@ Resources:
     Properties:
       PackageType: Image
       MemorySize: 2048
-      Timeout: 30
+      Timeout: 90
       Architectures:
         - arm64
       Events:
@@ -29,6 +29,24 @@ Resources:
       Dockerfile: Dockerfile
       DockerContext: ./dorothy_personel
       DockerTag: python3.11-v1
+  DorothyAgeFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      PackageType: Image
+      MemorySize: 2048
+      Timeout: 90
+      Architectures:
+        - arm64
+      Events:
+        DorothyAge:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /age
+            Method: post
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./dorothy_age
+      DockerTag: python3.11-v1
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -37,9 +55,15 @@ Outputs:
   DorothyPersonelApi:
     Description: "API Gateway endpoint URL for Prod stage for dorothy_personel function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/color/"
+  DorothyAgeApi:
+    Description: "API Gateway endpoint URL for Prod stage for dorothy_age function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/age/"
   DorothyPersonelFunction:
     Description: "dorothy_personel Lambda Function ARN"
     Value: !GetAtt DorothyPersonelFunction.Arn
+  DorothyAgeFunction:
+    Description: "dorothy_age Lambda Function ARN"
+    Value: !GetAtt DorothyAgeFunction.Arn
   DorothyPersonelFunctionIamRole:
     Description: "Implicit IAM Role created for dorothy_personel function"
     Value: !GetAtt DorothyPersonelFunctionRole.Arn
