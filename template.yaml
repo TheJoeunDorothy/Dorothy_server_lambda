@@ -8,15 +8,61 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 90
 
 Resources:
+  # Dorothy API 명세
+  DorothyAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true
+  # Dorothy API 사용량 명세
+  DorothyAPIPlan:
+    Type: 'AWS::ApiGateway::UsagePlan'
+    DependsOn:
+      - DorothyAPI
+    Properties:
+      ApiStages:
+        - ApiId: !Ref DorothyAPI
+          Stage: Prod
+      Description: Setting Usage for DorothyAPI Key.
+      Quota:
+        Limit: 10000
+        Period: MONTH
+      Throttle:
+        BurstLimit: 5
+        RateLimit: 5
+      UsagePlanName: "Dorothy-usage-plan"
+  # Dorothy API Api key
+  DorothyApiAccessKey:
+    Type: 'AWS::ApiGateway::ApiKey'
+    DependsOn:
+      - DorothyAPI
+    Properties:
+      Name: "Dorothy-api-key"
+      Description: To use usage plan and api key in REST API.
+      Tags: 
+      - Key: Mode
+        Value: Learning
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref DorothyAPI
+          StageName: Prod
+  # Link API key to Usage
+  LinkUsagePlanApiKey:
+    Type: "AWS::ApiGateway::UsagePlanKey"
+    Properties:
+      KeyId: !Ref DorothyApiAccessKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref DorothyAPIPlan
+  
   DorothyPersonelFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       PackageType: Image
-      MemorySize: 2048
-      Timeout: 90
+      MemorySize: 512
       Architectures:
         - arm64
       Events:
@@ -33,8 +79,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       PackageType: Image
-      MemorySize: 2048
-      Timeout: 90
+      MemorySize: 1024
       Architectures:
         - arm64
       Events:
