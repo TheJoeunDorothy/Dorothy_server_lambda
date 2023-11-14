@@ -62,7 +62,7 @@ def lambda_handler(event, context):
             b = forehead_color_rgb[2]
             clf = joblib.load("/var/task/static/voting_clf.h5")
             pre = clf.predict([[r, g, b]])
-
+            print(pre[1])
     except Exception as e:
         print(e)
         return {"statusCode": 400, "body": json.dumps({"result": "Can't predict Personel Color"})}
