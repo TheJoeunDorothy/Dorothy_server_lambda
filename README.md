@@ -10,7 +10,7 @@
 이 모든 기술은 `template.yaml`에 작성 되어있습니다.
 
 ## 서버 구성도
-<img src = https://github.com/Oh-Kang94/season3_team1_disabled_app/blob/main/Swagger-UI.png>  
+<img src = https://github.com/TheJoeunDorothy/Dorothy_server_lambda/blob/main/Readme/Dorothy_구성도.png>  
 
 ## 어플리케이션 배포방법
 
