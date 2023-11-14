@@ -12,7 +12,7 @@
 ## 서버 구성도
 <img src = https://github.com/TheJoeunDorothy/Dorothy_server_lambda/blob/main/Readme/Dorothy_구성도.png>  
 
-## 클래스 다이어그램
+## 시퀀스 다이어그램
 ### 1.dorothy_age
 <img src = https://github.com/TheJoeunDorothy/Dorothy_server_lambda/blob/main/Readme/dorothy_age.png>  
 
