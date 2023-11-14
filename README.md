@@ -6,11 +6,17 @@
 - dorothy_personel : Personel Color 예측을 위한 람다 함수와 Dockerfile 이미지
 - template.yaml - SAM의 구성도를 작성
 
-이 앱은 AWS Resources, 2개의 람다 함수, API GATEWAY API 설정이 포함 되어 있습니다.
+이 앱은 AWS Resources, 2개의 람다 함수, API GATEWAY API 설정이 포함 되어 있습니다.  
 이 모든 기술은 `template.yaml`에 작성 되어있습니다.
 
 ## 서버 구성도
 <img src = https://github.com/TheJoeunDorothy/Dorothy_server_lambda/blob/main/Readme/Dorothy_구성도.png>  
+
+## 클래스 다이어그램
+### 1.dorothy_age
+<img src = https://github.com/TheJoeunDorothy/Dorothy_server_lambda/blob/main/Readme/dorothy_age.png> 
+### 2.dorothy_personel
+<img src = https://github.com/TheJoeunDorothy/Dorothy_server_lambda/blob/main/Readme/dorothy_personel.png> 
 
 ## 어플리케이션 배포방법
 

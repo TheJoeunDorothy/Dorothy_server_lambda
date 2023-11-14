@@ -1,0 +1,26 @@
+@startuml
+
+title dorothy_age 시퀀스 다이어그렘
+
+actor Client
+box Server
+entity "Api Gateway"
+participant "AWS Lambda Function" as AWS
+participant "AI MODEL" as Model
+end box
+
+Client -> "Api Gateway": (1) POST ./Prod/age\n (@param Image Data [Base 64])
+"Api Gateway" -> AWS: (2) lambda_handler(event)
+AWS -> Model : (3) 얼굴 위치 확인 및 Resize 후 모델 예측
+Model --> AWS : (4) 예측값 전달\n(array)
+AWS --> "Api Gateway": (5) 결과 값 전달\n(@return json\n{class : ex) 20대,\npercent: 각 예측 확률})
+"Api Gateway" --> Client: HTTP Response\n (Predicted Result)
+
+note right of AWS
+  AWS Lambda function의 진행:
+  1. Image Decoding
+  2. Face Detection & Processing
+  3. Image ML Processing
+end note
+
+@enduml
