@@ -14,8 +14,10 @@
 
 ## 클래스 다이어그램
 ### 1.dorothy_age
-<img src = https://github.com/TheJoeunDorothy/Dorothy_server_lambda/blob/main/Readme/dorothy_age.png> 
-### 2.dorothy_personel
+<img src = https://github.com/TheJoeunDorothy/Dorothy_server_lambda/blob/main/Readme/dorothy_age.png>  
+
+### 2.dorothy_personel  
+
 <img src = https://github.com/TheJoeunDorothy/Dorothy_server_lambda/blob/main/Readme/dorothy_personel.png> 
 
 ## 어플리케이션 배포방법
